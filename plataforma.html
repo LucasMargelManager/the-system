@@ -1158,12 +1158,13 @@ function painelEquipe() {
       '<div class="campo"><label>Cargo</label><select name="CARGO"><option>Corretor</option><option>Coordenador</option><option>Gerente</option></select></div>' +
       '<div><button class="btn btn-ouro" type="submit">+ Cadastrar</button></div>' +
     '</form>' +
-    '<div class="tabela-wrap"><table><thead><tr><th>Nome</th><th>Cargo</th><th>Status</th><th>Entrada</th><th></th></tr></thead><tbody>' +
+    '<div class="tabela-wrap"><table><thead><tr><th>Nome</th><th>Cargo</th><th>Status</th><th>Telefone</th><th>Entrada</th><th></th></tr></thead><tbody>' +
     pessoas.map(function (c) {
       var ativo = norm(c.STATUS) !== 'INATIVO';
       return '<tr' + (ativo ? '' : ' style="opacity:.5"') + '><td><b>' + esc(c.NOME) + '</b><br><small style="color:var(--suave)">' + esc(c['NOME COMPLETO'] || '') + '</small></td>' +
-        '<td>' + esc(c.CARGO || '') + '</td><td>' + (ativo ? 'Ativo' : 'Inativo') + '</td><td>' + esc(c['DATA ENTRADA'] || '—') + '</td>' +
+        '<td>' + esc(c.CARGO || '') + '</td><td>' + (ativo ? 'Ativo' : 'Inativo') + '</td><td>' + esc(c.TELEFONE || '—') + '</td><td>' + esc(c['DATA ENTRADA'] || '—') + '</td>' +
         '<td style="white-space:nowrap;text-align:right">' +
+          '<button class="btn" data-editar="' + c._linha + '">✏️ Editar</button> ' +
           (ativo ? '<button class="btn" data-senha="' + esc(c.NOME) + '">🔑 Nova senha</button> ' : '') +
           (c.NOME === SESSAO.usuario.NOME ? '' : '<button class="btn" data-status="' + c._linha + '" data-nome="' + esc(c.NOME) + '" data-novo="' + (ativo ? 'Inativo' : 'Ativo') + '">' + (ativo ? 'Desativar' : 'Reativar') + '</button>') +
         '</td></tr>';
@@ -1225,6 +1226,50 @@ function ligarPainelEquipe(raiz) {
         b.getAttribute('data-nome') + ': ' + b.getAttribute('data-novo'));
     };
   });
+  raiz.querySelectorAll('[data-editar]').forEach(function (b) {
+    b.onclick = function () {
+      var linha = Number(b.getAttribute('data-editar'));
+      var c = (D.corretores || []).filter(function (x) { return x._linha === linha; })[0];
+      if (c) modalEditarCorretor(c);
+    };
+  });
+}
+
+// Editar nome de login, nome completo e telefone de alguém da equipe.
+// Trocar o nome de login renomeia a pessoa em TODAS as abas (vendas, agenda, pastas, ranking).
+function modalEditarCorretor(c) {
+  var eu = c.NOME === SESSAO.usuario.NOME;
+  abrirModal('<h3>Editar — ' + esc(c.NOME) + '</h3>' +
+    '<form id="f-editar-corretor">' +
+      '<div class="campo"><label>Nome de login (nome + sobrenome)</label><input name="NOME" value="' + esc(c.NOME) + '" required></div>' +
+      '<div class="campo"><label>Nome completo</label><input name="NOME_COMPLETO" value="' + esc(c['NOME COMPLETO'] || '') + '"></div>' +
+      '<div class="campo"><label>Telefone</label><input name="TELEFONE" value="' + esc(c.TELEFONE || '') + '" placeholder="(21) 99999-0000"></div>' +
+      '<p style="color:var(--suave);font-size:12px">Ao mudar o nome de login, a pessoa passa a entrar com o nome novo (a senha continua a mesma) e o histórico dela é renomeado em todas as abas.' +
+        (eu ? ' <b>Como é o seu próprio nome, você será desconectado e deve entrar de novo com o nome novo.</b>' : '') + '</p>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">' +
+        '<button type="button" class="btn" onclick="fecharModal()">Cancelar</button>' +
+        '<button type="submit" class="btn btn-ouro">Salvar</button></div>' +
+    '</form>');
+  var f = $('f-editar-corretor');
+  f.onsubmit = function (ev) {
+    ev.preventDefault();
+    var novoNome = f.NOME.value.trim().replace(/\s+/g, ' ');
+    if (novoNome.split(' ').length < 2) { toast('Informe nome e sobrenome', true); return; }
+    var b = f.querySelector('button[type=submit]'); b.disabled = true; b.textContent = 'Salvando…';
+    var mudouNome = novoNome !== c.NOME;
+    var passo1 = mudouNome ? api('corrigir_nome_corretor', { de: c.NOME, para: novoNome }) : Promise.resolve();
+    passo1.then(function () {
+      return api('atualizar_corretor', { linha: c._linha, conferir: { NOME: novoNome },
+        campos: { 'NOME COMPLETO': f.NOME_COMPLETO.value.trim(), TELEFONE: f.TELEFONE.value.trim() } });
+    }).then(function () {
+      fecharModal();
+      toast('Dados de ' + novoNome + ' salvos');
+      if (mudouNome && eu) { sair(); return; }
+      return carregar(false);
+    }).catch(function (e) {
+      toast(e.message, true); b.disabled = false; b.textContent = 'Salvar';
+    });
+  };
 }
 
 // ══════════════════════════════════════════════════════════════
