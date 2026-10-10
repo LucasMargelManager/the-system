@@ -1170,7 +1170,10 @@ function painelEquipe() {
     }).join('') + '</tbody></table></div></div>';
 }
 
-function linkApp() { return new URL('index.html', location.href).href; }
+// Sempre o endereço público — a plataforma pode estar aberta como arquivo local (file://),
+// e esse link não serviria para o corretor.
+var URL_PUBLICA_APP = 'https://lucasmargelmanager.github.io/the-system/';
+function linkApp() { return URL_PUBLICA_APP; }
 
 function mensagemAcesso(nome, senha) {
   return 'Olá, ' + String(nome).split(' ')[0] + '! Seu acesso ao THE SYSTEM da ' + ((D.config && D.config.NOME_EMPRESA) || 'equipe') + ' está pronto.\n\n' +
