@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TV · THE SYSTEM</title>
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0b0c; --bg2:#141416; --card:#1a1a1d; --borda:#2a2a2e;
+  --ouro:#b69c61; --ouro2:#d9c48f; --ouro3:#8a7444;
+  --txt:#f2efe8; --mut:#9a968c;
+  --azul:#4a8fd6; --roxo:#9a6ad6; --verde:#4fb07a; --vermelho:#d65a5a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;font-size:14px;cursor:default}
+body{background:radial-gradient(ellipse at top,#1c1913 0%,var(--bg) 60%)}
+
+/* ── Splash ── */
+#splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:50;background:radial-gradient(ellipse at center,#1f1b12 0%,#080808 70%)}
+#splash img{width:140px;height:140px;border-radius:24px;box-shadow:0 0 60px rgba(182,156,97,.35)}
+#splash h1{font-size:19px;letter-spacing:6px;color:var(--ouro);font-weight:700}
+#splash p{font-size:13px;color:var(--mut);letter-spacing:2px}
+#btnEntrar{margin-top:8px;padding:14px 56px;font:700 16px 'Inter',sans-serif;letter-spacing:4px;color:#0b0b0c;background:linear-gradient(135deg,var(--ouro2),var(--ouro));border:0;border-radius:40px;cursor:pointer;box-shadow:0 6px 30px rgba(182,156,97,.4)}
+#btnEntrar:focus{outline:3px solid var(--ouro2);outline-offset:4px}
+
+/* ── Estrutura ── */
+#app{position:fixed;inset:0;display:flex;flex-direction:column;padding:2.2vh 2.6vw}
+header{display:flex;align-items:center;justify-content:space-between;height:7vh;min-height:44px;border-bottom:1px solid var(--borda);padding-bottom:1.2vh}
+.marca{display:flex;align-items:center;gap:12px}
+.marca img{width:40px;height:40px;border-radius:9px}
+.marca b{font-size:17px;letter-spacing:3px;color:var(--ouro)}
+.marca span{display:block;font-size:11px;color:var(--mut);letter-spacing:2px;margin-top:2px}
+.titulo-slide{text-align:center}
+.titulo-slide h2{font-size:19px;letter-spacing:4px;font-weight:800;color:var(--txt)}
+.titulo-slide small{font-size:12px;color:var(--ouro);letter-spacing:2px}
+.relogio{text-align:right}
+.relogio b{font-size:19px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums}
+.relogio span{display:block;font-size:11px;color:var(--mut);letter-spacing:1px;margin-top:2px}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--verde);margin-right:6px;vertical-align:middle}
+.status-dot.off{background:var(--vermelho)}
+
+main{flex:1;position:relative;overflow:hidden;margin-top:2vh}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;display:flex;flex-direction:column;gap:2.2vh}
+.slide.ativo{opacity:1}
+
+footer{height:4vh;display:flex;align-items:center;gap:10px}
+.barras{flex:1;display:flex;gap:8px}
+.barra{flex:1;height:4px;background:var(--borda);border-radius:4px;overflow:hidden}
+.barra i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ouro3),var(--ouro2))}
+footer small{font-size:11px;color:var(--mut);letter-spacing:1px;white-space:nowrap}
+
+/* ── Pódio ── */
+.podio{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:1.6vw;height:50%}
+.pod{background:linear-gradient(180deg,#1f1c15,#151412);border:1px solid var(--borda);border-radius:16px;padding:1.6vh 1.2vw;display:flex;flex-direction:column;align-items:center;gap:1vh;position:relative}
+.pod.p1{height:100%;border-color:var(--ouro);box-shadow:0 0 40px rgba(182,156,97,.18)}
+.pod.p2{height:86%}
+.pod.p3{height:76%}
+.pod .med{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;color:#0b0b0c}
+.p1 .med{background:linear-gradient(135deg,#f3dfa6,#b69c61)}
+.p2 .med{background:linear-gradient(135deg,#e8e8e8,#9a9a9a)}
+.p3 .med{background:linear-gradient(135deg,#e0a874,#9a6236)}
+.pod .nome{font-size:17px;font-weight:700;text-align:center;line-height:1.2}
+.pod .tot{font-size:19px;font-weight:800;color:var(--ouro2)}
+.pod .tot small{font-size:11px;color:var(--mut);font-weight:500;letter-spacing:1px;margin-left:4px}
+.cats{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;width:100%;margin-top:auto}
+.cat{background:#0f0f10;border:1px solid var(--borda);border-radius:8px;padding:.7vh 0;text-align:center}
+.cat b{display:block;font-size:14px;font-variant-numeric:tabular-nums}
+.cat span{display:block;font-size:10px;color:var(--ouro);letter-spacing:1px;margin-top:2px}
+.cat.neg b{color:var(--vermelho)}
+.pod.vazio{opacity:.35;justify-content:center}
+
+/* ── Grid 4+ ── */
+.resto{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:min-content;gap:1vh 1.4vw;align-content:start;overflow:hidden}
+.lin{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--borda);border-radius:10px;padding:1vh 1vw}
+.lin .pos{width:28px;font-size:14px;font-weight:700;color:var(--ouro)}
+.lin .nm{flex:1;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lin .pt{font-size:15px;font-weight:800;color:var(--ouro2);font-variant-numeric:tabular-nums}
+.legenda{font-size:11px;color:var(--mut);letter-spacing:1px;text-align:center}
+
+/* ── Agenda ── */
+.agenda{flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:min-content;gap:1.4vh 1.2vw;align-content:start;overflow:hidden}
+.ag{background:var(--card);border:1px solid var(--borda);border-left:5px solid var(--ouro);border-radius:12px;padding:1.4vh 1vw;display:flex;flex-direction:column;gap:.6vh}
+.ag .h{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.ag .c{font-size:15px;font-weight:600;line-height:1.25}
+.ag .r{font-size:13px;color:var(--mut)}
+.ag .t{align-self:flex-start;font-size:10px;letter-spacing:1px;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase}
+.ag.feito{opacity:.6}
+.ag.feito .h::after{content:' ✓';color:var(--verde)}
+.vazio-msg{grid-column:1/-1;text-align:center;color:var(--mut);font-size:16px;padding-top:12vh}
+.erro-msg{color:var(--mut);font-size:16px;text-align:center;padding-top:20vh}
+
+/* ── Celebração ── */
+#confete{position:fixed;inset:0;pointer-events:none;z-index:40}
+#banner{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.6);opacity:0;z-index:41;background:linear-gradient(135deg,#221d12,#0d0c0a);border:2px solid var(--ouro);border-radius:22px;padding:3.4vh 4vw;text-align:center;box-shadow:0 0 80px rgba(182,156,97,.45);transition:all .5s cubic-bezier(.2,1.4,.4,1);min-width:40vw}
+#banner.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#banner .em{font-size:19px;letter-spacing:5px;color:var(--ouro);font-weight:800}
+#banner .q{font-size:19px;font-weight:800;margin-top:1.4vh}
+#banner .d{font-size:14px;color:var(--mut);margin-top:.8vh}
+/* ═══ CAMADA DOURADA THE SYSTEM (out/2026) — mais dourado na identidade Rangel ═══ */
+:root{
+  --ouro:#c4a35a; --ouro2:#e6cf8f; --ouro3:#8f733a;
+  --ouro-grad:linear-gradient(135deg,#f6e3a8 0%,#d4b36a 38%,#b08d45 70%,#e9d18c 100%);
+  --ouro-linha:linear-gradient(90deg,transparent,rgba(214,179,106,.55),transparent);
+  --borda:rgba(212,179,106,.20); --vidro:rgba(212,179,106,.045); --vidro2:rgba(212,179,106,.09);
+}
+body{
+  background:
+    radial-gradient(1100px 520px at 12% -12%,rgba(212,179,106,.16),transparent 62%),
+    radial-gradient(900px 480px at 100% 0%,rgba(176,141,69,.10),transparent 60%),
+    radial-gradient(1200px 700px at 50% 120%,rgba(176,141,69,.08),transparent 60%),
+    var(--bg) !important;
+  background-attachment:fixed !important;
+}
+h1,h2,.titulo-slide{
+  background:var(--ouro-grad);-webkit-background-clip:text;background-clip:text;color:transparent !important;
+}
+h3{color:var(--ouro2) !important;letter-spacing:.06em}
+.vidro,.card,.painel,.kpi,.cartao-login,.caixaLogin,.pod,.ag,.modal{
+  border-color:rgba(212,179,106,.24) !important;
+  box-shadow:inset 0 1px 0 rgba(246,227,168,.10),0 10px 30px rgba(0,0,0,.35);
+  position:relative;
+}
+.kpi::before,.painel::before,.cartao-login::before,.caixaLogin::before{
+  content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:var(--ouro-linha);pointer-events:none;
+}
+.kpi b,.kpi .val{
+  background:var(--ouro-grad);-webkit-background-clip:text;background-clip:text;color:transparent !important;
+}
+.btn-ouro,.aba.ativo,.agendarBtn,.btnCheck,#btnEntrar{
+  background:var(--ouro-grad) !important;color:#1a1408 !important;border-color:#d4b36a !important;
+  box-shadow:0 6px 22px rgba(212,179,106,.28),inset 0 1px 0 rgba(255,255,255,.35);
+  text-shadow:0 1px 0 rgba(255,255,255,.25);
+}
+.btn-ouro:hover,.agendarBtn:hover{filter:brightness(1.07)}
+.item.ativo,.nav .ativo,.nav button.ativo,.nav a.ativo{
+  background:linear-gradient(90deg,rgba(212,179,106,.24),rgba(212,179,106,.05)) !important;
+  color:var(--ouro2) !important;box-shadow:inset 3px 0 0 #d4b36a;
+}
+.topo,#lateral,header{border-color:rgba(212,179,106,.22) !important}
+#lateral{background:linear-gradient(180deg,rgba(212,179,106,.07),rgba(0,0,0,0) 40%),var(--bg2) !important}
+th{color:var(--ouro2) !important;border-bottom-color:rgba(212,179,106,.30) !important}
+.marca b,.marca h1{letter-spacing:.14em}
+img[src="icon-192.png"]{box-shadow:0 0 0 1px rgba(212,179,106,.45),0 0 22px rgba(212,179,106,.28);border-radius:12px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#d4b36a !important;box-shadow:0 0 0 3px rgba(212,179,106,.18)}
+::selection{background:rgba(212,179,106,.35)}
+*{scrollbar-color:rgba(212,179,106,.45) transparent}
+/* ═══ fim da camada dourada ═══ */
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <img src="icon-192.png" alt="">
+  <h1>THE SYSTEM</h1>
+  <p>TV DO ESCRITÓRIO</p>
+  <button id="btnEntrar" autofocus>ENTRAR</button>
+</div>
+
+<div id="app" style="display:none">
+  <header>
+    <div class="marca">
+      <img src="icon-192.png" alt="">
+      <div><b id="hEmpresa">RANGEL BROKER</b><span id="hMes">—</span></div>
+    </div>
+    <div class="titulo-slide"><h2 id="hTitulo">—</h2><small id="hSub"></small></div>
+    <div class="relogio"><b id="hHora">--:--</b><span><i class="status-dot" id="dot"></i><span id="hData"></span></span></div>
+  </header>
+  <main>
+    <section class="slide" id="s0"></section>
+    <section class="slide" id="s1"></section>
+    <section class="slide" id="s2"></section>
+  </main>
+  <footer>
+    <div class="barras"><div class="barra"><i id="b0"></i></div><div class="barra"><i id="b1"></i></div><div class="barra"><i id="b2"></i></div></div>
+    <small id="fAtual">—</small>
+  </footer>
+</div>
+
+<canvas id="confete"></canvas>
+<div id="banner"><div class="em" id="bnEm"></div><div class="q" id="bnQ"></div><div class="d" id="bnD"></div></div>
+
+<script>
+var API_URL = 'https://script.google.com/macros/s/AKfycbzV4DkclF3pQfkTXJIfSCpVDTi8ScSUqV8tHxszU6dVF6GI3_kFbjE3gWMu7uCkFKxX/exec';
+var DURACOES = [20000, 15000, 15000];       // mensal, semanal, agenda
+var INTERVALO_BUSCA = 30000;
+var RELOAD_MS = 60 * 60 * 1000;
+var DADOS = null;
+var ULTIMOS_CONTADORES = null;
+var SLIDE_ATUAL = 0;
+var SLIDE_INICIO = 0;
+var AUDIO_CTX = null;
+var CORES_TIPO = {
+  'CLIENTE': '#b69c61',
+  'REUNIAO SEMANAL': '#4a8fd6',
+  'ALINHAMENTO MENSAL': '#9a6ad6',
+  'MEETING EMPRESA': '#4fb07a'
+};
+var MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+var DIAS = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+
+function esc(s) {
+  return String(s === null || s === undefined ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function norm(s) {
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().trim();
+}
+function dataBR(iso) {
+  if (!iso) return '';
+  var p = String(iso).slice(0, 10).split('-');
+  return p.length === 3 ? p[2] + '/' + p[1] : iso;
+}
+function num(n) { return Number(n) || 0; }
+
+// ── Entrada / tela cheia ──
+function entrar() {
+  try { if (!AUDIO_CTX) AUDIO_CTX = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+  try {
+    var el = document.documentElement;
+    var fs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (fs) { var r = fs.call(el); if (r && r.catch) r.catch(function () {}); }
+  } catch (e) {}
+  try { sessionStorage.setItem('tvEntrou', '1'); } catch (e) {}
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  iniciar();
+}
+document.getElementById('btnEntrar').addEventListener('click', entrar);
+document.addEventListener('keydown', function (e) {
+  if (document.getElementById('splash').style.display !== 'none' && (e.key === 'Enter' || e.keyCode === 13)) entrar();
+});
+
+// ── Relógio ──
+function tickRelogio() {
+  var d = new Date();
+  document.getElementById('hHora').textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  document.getElementById('hData').textContent = DIAS[d.getDay()] + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()];
+}
+
+// ── API ──
+function buscar() {
+  return fetch(API_URL + '?acao=tv&_=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      if (!j || j.status !== 'ok') throw new Error(j && j.mensagem || 'erro');
+      var d = j.dados;
+      document.getElementById('dot').className = 'status-dot';
+      verificarCelebracoes(d);
+      DADOS = d;
+      renderTudo();
+    })
+    .catch(function () {
+      document.getElementById('dot').className = 'status-dot off';
+      if (!DADOS) renderTudo();
+    });
+}
+
+function verificarCelebracoes(d) {
+  var c = d.contadores || { agendamentos: 0, vendas: 0 };
+  if (ULTIMOS_CONTADORES) {
+    if (num(c.vendas) > num(ULTIMOS_CONTADORES.vendas)) {
+      var v = d.ultimaVenda || {};
+      var tipo = norm(v.STATUS_VENDA) === 'CONSORCIO' ? 'CONSÓRCIO FECHADO!' : 'VENDA FECHADA!';
+      celebrar(true, tipo, v.CORRETOR || '', v.EMPREENDIMENTO || '');
+    } else if (num(c.agendamentos) > num(ULTIMOS_CONTADORES.agendamentos)) {
+      var a = d.ultimoAgendamento || {};
+      celebrar(false, 'NOVO AGENDAMENTO!', a.CORRETOR || '', [a.CLIENTE, a.DATA ? dataBR(a.DATA) : '', a.HORA].filter(Boolean).join(' · '));
+    }
+  }
+  ULTIMOS_CONTADORES = { agendamentos: num(c.agendamentos), vendas: num(c.vendas) };
+}
+
+// ── Render ──
+function renderTudo() {
+  var d = DADOS;
+  if (!d) {
+    ['s0', 's1', 's2'].forEach(function (id) {
+      document.getElementById(id).innerHTML = '<div class="erro-msg">Conectando ao THE SYSTEM…</div>';
+    });
+    return;
+  }
+  document.getElementById('hEmpresa').textContent = String(d.empresa || 'Rangel Broker').toUpperCase();
+  document.getElementById('hMes').textContent = 'MÊS COMERCIAL · ' + String(d.mesComercial || '').toUpperCase();
+  document.getElementById('s0').innerHTML = htmlRanking(d.mensal || [], 'Pontuação do mês comercial · coordenação e gerência fora do ranking');
+  document.getElementById('s1').innerHTML = htmlRanking(d.semanal || [], 'Semana de quarta a terça · sem penalidades · zera toda quarta-feira');
+  document.getElementById('s2').innerHTML = htmlAgenda(d.agendaHoje || []);
+  atualizarTitulo();
+}
+
+function catsHtml(L) {
+  var itens = [
+    ['CK', num(L.CKp)], ['945', num(L.P945)], ['AG', num(L.AG)], ['AT', num(L.ATp)],
+    ['PA', num(L.PA) * 5], ['VE', num(L.VE) * 40], ['CO', num(L.CO) * 10]
+  ];
+  return '<div class="cats">' + itens.map(function (it) {
+    return '<div class="cat' + (it[1] < 0 ? ' neg' : '') + '"><b>' + it[1] + '</b><span>' + it[0] + '</span></div>';
+  }).join('') + '</div>';
+}
+
+function podHtml(L, pos) {
+  if (!L) return '<div class="pod p' + pos + ' vazio"><div class="med">' + pos + '</div><div class="nome">—</div></div>';
+  return '<div class="pod p' + pos + '">' +
+    '<div class="med">' + pos + '</div>' +
+    '<div class="nome">' + esc(L.nomeCompleto || L.corretor) + '</div>' +
+    '<div class="tot">' + num(L.total) + '<small>PTS</small></div>' +
+    catsHtml(L) + '</div>';
+}
+
+function htmlRanking(lista, legenda) {
+  if (!lista.length) return '<div class="erro-msg">Ranking ainda sem pontuação.</div>';
+  var podio = '<div class="podio">' + podHtml(lista[1], 2) + podHtml(lista[0], 1) + podHtml(lista[2], 3) + '</div>';
+  var resto = lista.slice(3, 27).map(function (L, i) {
+    return '<div class="lin"><span class="pos">' + (L.posicao || i + 4) + 'º</span><span class="nm">' + esc(L.corretor) + '</span><span class="pt">' + num(L.total) + '</span></div>';
+  }).join('');
+  return podio + '<div class="resto">' + resto + '</div>' +
+    '<div class="legenda">' + esc(legenda) + ' · CK check-in · 945 registro · AG agendamento · AT atendimento · PA pasta · VE venda · CO consórcio</div>';
+}
+
+function htmlAgenda(itens) {
+  if (!itens.length) return '<div class="agenda"><div class="vazio-msg">Nenhum agendamento para hoje — bora agendar! 📅</div></div>';
+  return '<div class="agenda">' + itens.slice(0, 24).map(function (a) {
+    var cor = CORES_TIPO[norm(a.TIPO).replace(/\s+/g, ' ')] || '#b69c61';
+    var feito = /^SIM/.test(norm(a.ATENDIDO));
+    return '<div class="ag' + (feito ? ' feito' : '') + '" style="border-left-color:' + cor + '">' +
+      '<div class="h">' + esc(String(a.HORA || '').slice(0, 5)) + '</div>' +
+      '<div class="c">' + esc(a.CLIENTE) + '</div>' +
+      '<div class="r">' + esc(a.CORRETOR) + '</div>' +
+      '<span class="t" style="background:' + cor + '22;color:' + cor + '">' + esc(a.TIPO || 'Cliente') + '</span>' +
+      '</div>';
+  }).join('') + '</div>';
+}
+
+// ── Rotação ──
+var TITULOS = [
+  function (d) { return ['RANKING MENSAL', String(d && d.mesComercial || '').toUpperCase()]; },
+  function (d) { return ['RANKING SEMANAL', d && d.semana ? dataBR(d.semana.inicio) + ' (QUA) → ' + dataBR(d.semana.fim) + ' (TER)' : '']; },
+  function () { return ['AGENDA DO DIA', 'ATENDIMENTOS E REUNIÕES DE HOJE']; }
+];
+
+function atualizarTitulo() {
+  var t = TITULOS[SLIDE_ATUAL](DADOS);
+  document.getElementById('hTitulo').textContent = t[0];
+  document.getElementById('hSub').textContent = t[1];
+  document.getElementById('fAtual').textContent = (SLIDE_ATUAL + 1) + ' / 3';
+}
+
+function mostrarSlide(i) {
+  SLIDE_ATUAL = i;
+  SLIDE_INICIO = Date.now();
+  for (var k = 0; k < 3; k++) {
+    document.getElementById('s' + k).className = 'slide' + (k === i ? ' ativo' : '');
+    document.getElementById('b' + k).style.width = k < i ? '100%' : '0';
+  }
+  atualizarTitulo();
+}
+
+function tickProgresso() {
+  var dec = Date.now() - SLIDE_INICIO, dur = DURACOES[SLIDE_ATUAL];
+  document.getElementById('b' + SLIDE_ATUAL).style.width = Math.min(100, dec / dur * 100) + '%';
+  if (dec >= dur) mostrarSlide((SLIDE_ATUAL + 1) % 3);
+}
+
+// ── Som (Web Audio API) ──
+function ctxAudio() {
+  try {
+    if (!AUDIO_CTX) AUDIO_CTX = new (window.AudioContext || window.webkitAudioContext)();
+    if (AUDIO_CTX.state === 'suspended') AUDIO_CTX.resume();
+    return AUDIO_CTX;
+  } catch (e) { return null; }
+}
+function nota(ctx, freq, ini, dur, tipo, vol) {
+  var o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = tipo || 'triangle';
+  o.frequency.value = freq;
+  var t = ctx.currentTime + ini;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol || 0.18, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(ctx.destination);
+  o.start(t); o.stop(t + dur + 0.05);
+}
+function acordeAlegre() {
+  var c = ctxAudio(); if (!c) return;
+  [523.25, 659.25, 783.99].forEach(function (f, i) { nota(c, f, i * 0.09, 0.5, 'triangle', 0.16); });
+  [523.25, 659.25, 783.99, 1046.5].forEach(function (f) { nota(c, f, 0.38, 1.1, 'sine', 0.12); });
+}
+function fanfarraEpica() {
+  var c = ctxAudio(); if (!c) return;
+  var seq = [[392, 0, .16], [392, .18, .16], [392, .36, .16], [523.25, .54, .6], [466.16, 1.2, .2], [523.25, 1.42, .2], [587.33, 1.64, .2], [659.25, 1.86, 1.4]];
+  seq.forEach(function (s) { nota(c, s[0], s[1], s[2] + .1, 'sawtooth', 0.09); nota(c, s[0] / 2, s[1], s[2] + .1, 'square', 0.05); });
+  [523.25, 659.25, 783.99, 1046.5].forEach(function (f) { nota(c, f, 1.86, 1.8, 'triangle', 0.1); });
+  for (var i = 0; i < 8; i++) nota(c, 80, 1.86 + i * 0.06, 0.12, 'square', 0.06);
+}
+
+// ── Confete ──
+var CANVAS = document.getElementById('confete'), CX = CANVAS.getContext('2d'), PARTS = [], ANIM = false;
+function redimCanvas() { CANVAS.width = window.innerWidth; CANVAS.height = window.innerHeight; }
+window.addEventListener('resize', redimCanvas);
+redimCanvas();
+function soltarConfete(qtd) {
+  var cores = ['#b69c61', '#d9c48f', '#f3dfa6', '#ffffff', '#8a7444', '#4fb07a', '#4a8fd6'];
+  for (var i = 0; i < qtd; i++) {
+    PARTS.push({
+      x: Math.random() * CANVAS.width, y: -20 - Math.random() * CANVAS.height * 0.5,
+      vx: (Math.random() - 0.5) * 4, vy: 2 + Math.random() * 4,
+      r: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.3,
+      w: 6 + Math.random() * 8, h: 4 + Math.random() * 6, cor: cores[i % cores.length]
+    });
+  }
+  if (!ANIM) { ANIM = true; requestAnimationFrame(animConfete); }
+}
+function animConfete() {
+  CX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+  PARTS = PARTS.filter(function (p) { return p.y < CANVAS.height + 30; });
+  PARTS.forEach(function (p) {
+    p.x += p.vx; p.y += p.vy; p.vy += 0.04; p.r += p.vr;
+    CX.save(); CX.translate(p.x, p.y); CX.rotate(p.r);
+    CX.fillStyle = p.cor; CX.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    CX.restore();
+  });
+  if (PARTS.length) requestAnimationFrame(animConfete);
+  else { ANIM = false; CX.clearRect(0, 0, CANVAS.width, CANVAS.height); }
+}
+
+var BANNER_TIMER = null;
+function celebrar(venda, titulo, quem, detalhe) {
+  soltarConfete(venda ? 420 : 160);
+  if (venda) { fanfarraEpica(); setTimeout(function () { soltarConfete(260); }, 1200); }
+  else acordeAlegre();
+  document.getElementById('bnEm').textContent = (venda ? '🏆 ' : '📅 ') + titulo;
+  document.getElementById('bnQ').textContent = quem;
+  document.getElementById('bnD').textContent = detalhe;
+  var b = document.getElementById('banner');
+  b.className = 'on';
+  clearTimeout(BANNER_TIMER);
+  BANNER_TIMER = setTimeout(function () { b.className = ''; }, venda ? 9000 : 6000);
+}
+
+// ── Início ──
+var INICIADO = false;
+function iniciar() {
+  if (INICIADO) return;
+  INICIADO = true;
+  tickRelogio();
+  setInterval(tickRelogio, 1000 * 15);
+  renderTudo();
+  mostrarSlide(0);
+  setInterval(tickProgresso, 200);
+  buscar();
+  setInterval(buscar, INTERVALO_BUSCA);
+  setTimeout(function () { location.reload(); }, RELOAD_MS);
+}
+
+// Após o auto-reload de 1 h, volta direto para os slides (sem exigir novo ENTRAR).
+try {
+  if (sessionStorage.getItem('tvEntrou') === '1') entrar();
+} catch (e) {}
+document.getElementById('btnEntrar').addEventListener('click', function () {
+  try { sessionStorage.setItem('tvEntrou', '1'); } catch (e) {}
+});
+</script>
+</body>
+</html>
